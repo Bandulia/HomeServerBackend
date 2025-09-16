@@ -122,8 +122,11 @@ namespace HomeServer.Core
 
         public void AddSubTask(string subTask)
         {
-            SubTasks.Add(subTask, false);
-            _updatedAt = DateTime.Now;
+            if (!SubTasks.ContainsKey(subTask))
+            {
+                SubTasks.Add(subTask, false);
+                _updatedAt = DateTime.Now;
+            }
         }
 
         public void RemoveSubTask(string subTask)
@@ -162,7 +165,7 @@ namespace HomeServer.Core
 
         public Dictionary<string, bool> GetSubTasks()
         {
-            return SubTasks;
+            return new Dictionary<string, bool>(SubTasks);
         }
 
         public void AddNote(string note)
@@ -179,7 +182,7 @@ namespace HomeServer.Core
 
         public List<string> GetNotes()
         {
-            return Notes;
+            return new List<string>(Notes);
         }
     }
 }

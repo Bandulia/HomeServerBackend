@@ -12,7 +12,7 @@
         }
 
         [Fact]
-        public void Title_IsSetCorrectly()
+        public void Constructor_TitleAndDescription_AreSetCorrectly()
         {
             var _todo = CreateToDo();
             Assert.Equal("Test Task", _todo.Title);
@@ -43,7 +43,7 @@
         }
 
         [Fact]
-        public void Priority_CanBeChanged()
+        public void SetPriority_UpdatesValueCorrectly()
         {
             var _todo = CreateToDo();
             _todo.Priority = Core.PriorityLevel.High;
@@ -64,7 +64,7 @@
         }
 
         [Fact]
-        public void Notes_CanBeAddedAndRemoved()
+        public void AddNote_ThenRemoveNote_NotesListUpdatedCorrectly()
         {
             var _todo = CreateToDo();
             _todo.AddNote("First note");
@@ -153,6 +153,43 @@
 
             _todo.AddNote("Note");
             Assert.True(_todo.UpdatedAt > before);
+        }
+
+        [Fact]
+        public void AddSubTask_AddDuplicated_DoesNothing()
+        {
+            var _todo = CreateToDo();
+            _todo.AddSubTask("Subtask 1");
+            _todo.AddSubTask("Subtask 1");
+            Assert.Single(_todo.GetSubTasks());
+        }
+
+        [Fact]
+        public void RemoveNote_DoesNotThrowIfNoteNotFound()
+        {
+            var _todo = CreateToDo();
+            _todo.RemoveNote("Nonexistent note");
+            Assert.Empty(_todo.GetNotes());
+        }
+
+        [Fact]
+        public void UpdatedAt_IsChangedWhenDueDateIsSet()
+        {
+            var _todo = CreateToDo();
+            var before = _todo.UpdatedAt;
+            Thread.Sleep(10);
+            _todo.DueDate = DateTime.Now.AddDays(1);
+            Assert.True(_todo.UpdatedAt > before);
+        }
+
+
+        [Fact]
+        public void GetNotes_ReturnsCopy()
+        {
+            var _todo = CreateToDo();
+            var notes = _todo.GetNotes();
+            notes.Add("Extern note");
+            Assert.DoesNotContain("Extern note", _todo.GetNotes());
         }
     }
 }
