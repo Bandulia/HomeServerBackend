@@ -1,10 +1,10 @@
 ﻿namespace HomeServer.Tests
 {
-    public class ToDoTests
+    public class TodoTests
     {
-        private Core.ToDo CreateToDo()
+        private Core.Todo CreateToDo()
         {
-            return new Core.ToDo
+            return new Core.Todo
             {
                 Title = "Test Task",
                 Description = "This is a test task",

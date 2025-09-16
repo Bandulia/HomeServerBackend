@@ -1,23 +1,35 @@
+using HomeServer.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure database path and register DbContext with SQLite
+builder.Services.AddDbContext<TodoListDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// Add essential services for controllers and API documentation
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+
+// Register application services
+builder.Services.AddScoped<TodoEntity>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
 }
 
+// Ensure the database is created and migrations are applied at startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TodoListDbContext>();
+    //db.Database.Migrate(); // Applies any pending migrations (only for development, for production use CI/CD)
+}
+
+// Configure middleware
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

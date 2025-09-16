@@ -11,7 +11,7 @@ namespace HomeServer.Core
 
     }
 
-    public class ToDo
+    public class Todo
     {        
         private DateTime? _updatedAt;
         private DateTime? _completedAt;
@@ -182,7 +182,7 @@ namespace HomeServer.Core
 
         public List<string> GetNotes()
         {
-            return new List<string>(Notes);
+            return [.. Notes];
         }
     }
 }
