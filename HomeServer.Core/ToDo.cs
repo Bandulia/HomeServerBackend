@@ -23,8 +23,28 @@ namespace HomeServer.Core
         public DateTime CreatedAt { get; } = DateAndTime.Now;     
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public bool IsCompleted { get; set; } = false;
         public PriorityLevel Priority { get; set; } = PriorityLevel.Low;
+
+        public bool IsCompleted
+        {
+            get
+            {
+                return _completedAt != null;
+            }
+            set
+            {
+                if (value && _completedAt == null)
+                {
+                    _completedAt = DateTime.Now;
+                    _updatedAt = DateTime.Now;
+                }
+                else if (!value && _completedAt != null)
+                {
+                    _completedAt = null;
+                    _updatedAt = DateTime.Now;
+                }
+            }
+        }
 
         public bool IsRecurring 
         { 
@@ -63,6 +83,7 @@ namespace HomeServer.Core
                 }
             } 
         }
+
         public DateTime? CompletedAt 
         {
             get
@@ -111,7 +132,7 @@ namespace HomeServer.Core
             _updatedAt = DateTime.Now;
         }
 
-        public void CompleteSubTask(string subTask)
+        public bool CompleteSubTask(string subTask)
         {
             if (SubTasks.ContainsKey(subTask))
             {
@@ -121,9 +142,9 @@ namespace HomeServer.Core
             if (SubTasks.All(st => st.Value))
             {
                 IsCompleted = true;
-                _completedAt = DateTime.Now;
-                //TODO: Trigger notification for task completion
+                return true;
             }
+            return false;
         }
 
         public void UnmarkSubtaskAsCompleted(string subTask)
@@ -131,6 +152,10 @@ namespace HomeServer.Core
             if (SubTasks.ContainsKey(subTask))
             {
                 SubTasks[subTask] = false;
+                if (IsCompleted)
+                {
+                    IsCompleted = false;
+                }
                 _updatedAt = DateTime.Now;
             }
         }
